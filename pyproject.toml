@@ -32,13 +32,15 @@ include = ["ocla"]
 
 [project.optional-dependencies]
 examples = [
-    "notebook",
+    "jupyterlab",
+    "seaborn",
 ]
 tests = [
     "black[jupyter]",
     "pylint",
     "pytest",
     "pytype",
+    "treon",
 ]
 
 [project.urls]
