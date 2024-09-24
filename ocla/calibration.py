@@ -7,7 +7,7 @@ from enum import Enum, auto
 import numpy as np
 import pandas as pd
 
-from model_calibration.confidence import CONFIDENCE_LEVELS, ModelConfidence, get_bounds
+from model_calibration.confidence import CONFIDENCE_THRESHOLDS, ModelConfidence, get_bounds
 from model_calibration.utilities import Transform
 
 logging.basicConfig(level=logging.INFO)
@@ -26,9 +26,9 @@ def get_best_confidence_levels(locations: np.ndarray, labels: np.ndarray, transf
         Array with shape [num_values] containing the best possible confidence level for each prediction.
     """
     confidence_levels = [ModelConfidence.A, ModelConfidence.B, ModelConfidence.C]
-    assert len(confidence_levels) == len(CONFIDENCE_LEVELS)
+    assert len(confidence_levels) == len(CONFIDENCE_THRESHOLDS)
     best_confidence_levels = np.asarray([ModelConfidence.D] * len(locations), dtype=object)
-    for confidence_level, threshold in zip(confidence_levels, CONFIDENCE_LEVELS):
+    for confidence_level, threshold in zip(confidence_levels, CONFIDENCE_THRESHOLDS):
         min_values, max_values = get_bounds(labels, threshold, transform)
         mask = np.logical_and(
             best_confidence_levels == ModelConfidence.D,
@@ -42,7 +42,7 @@ class Calibration(Enum):
     """Calibration categories for individual predictions."""
 
     # The assigned confidence level matches the "best case" confidence level.
-    ACCURATE = auto()
+    CORRECT = auto()
     # The assigned confidence level is more conservative than the "best case" confidence level. For instance, if the
     # assigned confidence level is "B" and the "best case" confidence level is "A".
     UNDERCONFIDENT = auto()
@@ -57,7 +57,7 @@ def assign_calibration_levels(data: pd.DataFrame, transform: Transform) -> pd.Da
     data["transform"] = transform.name
     data["confidence_level_best_case"] = [value.name for value in best_confidence_levels]
     key = "confidence_level_calibration"
-    data.loc[data["confidence_level_best_case"] == data["confidence_level"], key] = Calibration.ACCURATE.name
+    data.loc[data["confidence_level_best_case"] == data["confidence_level"], key] = Calibration.CORRECT.name
     data.loc[data["confidence_level_best_case"] < data["confidence_level"], key] = Calibration.UNDERCONFIDENT.name
     data.loc[data["confidence_level_best_case"] > data["confidence_level"], key] = Calibration.OVERCONFIDENT.name
     return data
@@ -78,6 +78,7 @@ def get_global_calibration_data(data: pd.DataFrame, delta: datetime.timedelta | 
     Returns:
         DataFrame containing a single row for each compound.
     """
+    data = data.copy()
     if delta is None:
         data["max_prediction_date"] = data["assay_date"]
     else:

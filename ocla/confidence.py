@@ -23,7 +23,7 @@ class ModelConfidence(Enum):
     D = auto()
 
 
-CONFIDENCE_LEVELS: tuple[float, ...] = (1.5, 3.0, 10.0)
+CONFIDENCE_THRESHOLDS: tuple[float, ...] = (1.5, 3.0, 10.0)
 ConfidenceModel = tuple[StandardScaler, LogisticRegression]
 
 
@@ -60,7 +60,7 @@ def build_confidence_models(
     features = np.stack([cv_results["location"], cv_results["scale"]]).T
     assert features.shape == (len(cv_results), 2)
     confidence_models = {}
-    for threshold in CONFIDENCE_LEVELS:
+    for threshold in CONFIDENCE_THRESHOLDS:
         locations = cv_results["location"].values
         labels = cv_results["label"].values
         min_values, max_values = get_bounds(labels, threshold, transform)
@@ -91,7 +91,7 @@ def predict_confidence(predictions: pd.DataFrame, confidence_models: dict[float,
     features = np.stack([predictions["location"], predictions["scale"]]).T
     assert features.shape == (len(predictions), 2)
     confidence = np.zeros((len(predictions), len(confidence_models)), dtype=float)
-    for i, threshold in enumerate(CONFIDENCE_LEVELS):
+    for i, threshold in enumerate(CONFIDENCE_THRESHOLDS):
         if confidence_models[threshold] is None:
             confidence[:, i] = np.nan
             continue
@@ -115,7 +115,7 @@ def assign_confidence(
     confidence_predictions = predict_confidence(predictions, confidence_models=confidence_models)
     rows = []
     for confidence_row in confidence_predictions:
-        row = {f"p(within {threshold:g}x)": confidence_row[j] for j, threshold in enumerate(CONFIDENCE_LEVELS)}
+        row = {f"p(within {threshold:g}x)": confidence_row[j] for j, threshold in enumerate(CONFIDENCE_THRESHOLDS)}
         row["confidence_level"] = assign_confidence_level(confidence_row)
         rows.append(row)
     return pd.DataFrame(rows)
@@ -131,7 +131,7 @@ def assign_confidence_level(row: np.ndarray, threshold: float = 0.8) -> ModelCon
     Returns:
         ModelConfidence assignment.
     """
-    expected_shape = (len(CONFIDENCE_LEVELS),)
+    expected_shape = (len(CONFIDENCE_THRESHOLDS),)
     if row.shape != expected_shape:
         raise ValueError(f"Expected shape {expected_shape}; got {row.shape}")
     if row[0] >= threshold:
