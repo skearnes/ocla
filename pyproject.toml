@@ -1,0 +1,76 @@
+[build-system]
+requires = [
+    "setuptools >= 64",
+    "setuptools_scm >= 8",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "model-calibration"
+description = "Model calibration."
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+]
+dynamic = ["version"]
+dependencies = [
+    "docopt",
+    "numpy",
+    "pandas",
+    "pyarrow",
+    "rdkit",
+    "scikit-learn >= 1.5.1",
+    "tqdm",
+]
+requires-python = ">= 3.10"
+authors = [
+    {name = "Steven Kearnes", email = "skearnes@relaytx.com"},
+]
+
+[tool.setuptools.packages.find]
+include = ["model_calibration"]
+
+[project.optional-dependencies]
+examples = [
+    "notebook",
+]
+tests = [
+    "black[jupyter]",
+    "pylint",
+    "pytest",
+    "pytype",
+]
+
+[project.urls]
+Repository = "http://TODO"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+line_length = 120
+profile = "black"
+
+[tool.pylint.basic]
+docstring-min-length = 3
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint."messages control"]
+disable = [
+    "logging-fstring-interpolation",
+    "no-member",
+    "no-name-in-module",
+    "too-many-arguments",
+    "too-many-locals",
+]
+
+[tool.pytype]
+inputs = ["*.py", "model_calibration"]
+exclude = ["**/*_test.py", "build/", "dist/"]
+keep_going = true
+jobs = 0
+
+[tool.setuptools_scm]
+version_file = "model_calibration/__version__.py"
