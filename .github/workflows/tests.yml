@@ -1,0 +1,62 @@
+# Copyright 2024 Relay Therapeutics, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  test_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install ocla
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install .[tests]
+      - name: Run lint
+        run: |
+          black --check .
+          isort --check .
+          # Run pylint in two stages: (1) regular files, (2) tests.
+          pylint --ignore="__version__.py" --ignore-patterns=".*_test\.py" ocla
+          pylint --disable="missing-function-docstring" ocla/**/*_test.py
+          pytype
+
+  test_ocla:
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install ocla
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install .[tests]
+      - name: Run tests
+        run: |
+          pytest -vv
