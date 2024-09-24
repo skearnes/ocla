@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for model_calibration.confidence."""
+"""Tests for ocla.confidence."""
 
 import numpy as np
 import pytest
 
-from model_calibration.confidence import ModelConfidence, assign_confidence_level, get_bounds
-from model_calibration.utilities import Transform
+from ocla.confidence import ModelConfidence, assign_confidence_level, get_bounds
+from ocla.utilities import Transform
 
 
 @pytest.mark.parametrize(

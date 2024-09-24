@@ -29,9 +29,9 @@ from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import Kernel
 from sklearn.model_selection import KFold
 
-from model_calibration.calibration import assign_calibration_levels
-from model_calibration.confidence import ConfidenceModel, assign_confidence, build_confidence_models
-from model_calibration.utilities import Transform
+from ocla.calibration import assign_calibration_levels
+from ocla.confidence import ConfidenceModel, assign_confidence, build_confidence_models
+from ocla.utilities import Transform
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

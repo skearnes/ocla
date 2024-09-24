@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for model_calibration.utilities."""
+"""Tests for ocla.utilities."""
 
 import datetime
 
 import numpy as np
 import pytest
 
-from model_calibration.utilities import Transform, get_training_dates
+from ocla.utilities import Transform, get_training_dates
 
 
 @pytest.mark.parametrize(

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for model_calibration.models."""
+"""Tests for ocla.models."""
 
 import numpy as np
 import pandas as pd
@@ -20,8 +20,8 @@ import pytest
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
 
-from model_calibration.confidence import Transform
-from model_calibration.models import Model, ModelType, TanimotoKernel
+from ocla.confidence import Transform
+from ocla.models import Model, ModelType, TanimotoKernel
 
 SMILES = ["CCC", "CCO", "CC(=O)N"]
 

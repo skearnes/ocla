@@ -21,8 +21,8 @@ from enum import Enum, auto
 import numpy as np
 import pandas as pd
 
-from model_calibration.confidence import CONFIDENCE_THRESHOLDS, ModelConfidence, get_bounds
-from model_calibration.utilities import Transform
+from ocla.confidence import CONFIDENCE_THRESHOLDS, ModelConfidence, get_bounds
+from ocla.utilities import Transform
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -7,8 +7,8 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "model-calibration"
-description = "Model calibration."
+name = "ocla"
+description = "Ordinal Confidence Level Assignment for Regression Model Predictions"
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
 ]
@@ -28,7 +28,7 @@ authors = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["model_calibration"]
+include = ["ocla"]
 
 [project.optional-dependencies]
 examples = [
@@ -42,7 +42,7 @@ tests = [
 ]
 
 [project.urls]
-Repository = "http://TODO"
+Repository = "https://github.com/skearnes/ocla"
 
 [tool.black]
 line-length = 120
@@ -67,10 +67,10 @@ disable = [
 ]
 
 [tool.pytype]
-inputs = ["*.py", "model_calibration"]
+inputs = ["*.py", "ocla"]
 exclude = ["**/*_test.py", "build/", "dist/"]
 keep_going = true
 jobs = 0
 
 [tool.setuptools_scm]
-version_file = "model_calibration/__version__.py"
+version_file = "ocla/__version__.py"

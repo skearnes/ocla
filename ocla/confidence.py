@@ -22,7 +22,7 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-from model_calibration.utilities import Transform
+from ocla.utilities import Transform
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
