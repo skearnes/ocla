@@ -20,8 +20,9 @@ from enum import Enum, auto
 
 import numpy as np
 import pandas as pd
+from scipy.stats import norm
 
-from ocla.confidence import CONFIDENCE_THRESHOLDS, ModelConfidence, get_bounds
+from ocla.confidence import CONFIDENCE_THRESHOLDS, ModelConfidence, assign_confidence_level, get_bounds
 from ocla.utilities import Transform
 
 logging.basicConfig(level=logging.INFO)
@@ -75,6 +76,39 @@ def assign_calibration_levels(data: pd.DataFrame, transform: Transform) -> pd.Da
     data.loc[data["confidence_level_best_case"] < data["confidence_level"], key] = Calibration.UNDERCONFIDENT.name
     data.loc[data["confidence_level_best_case"] > data["confidence_level"], key] = Calibration.OVERCONFIDENT.name
     return data
+
+
+def get_baseline_calibration_data(calibration_data: pd.DataFrame, transform: Transform) -> pd.DataFrame:
+    """Calculates calibration data for a simple baseline model."""
+    columns = [
+        "mol_id",
+        "label",
+        "assay_date",
+        "operator",
+        "transform",
+        "model_id",
+        "location",
+        "scale",
+        "model_date",
+        "model_name",
+        "model_type",
+    ]
+    baseline_data = calibration_data.copy()
+    for column in baseline_data.columns:
+        if column not in columns:
+            del baseline_data[column]
+    confidence = np.zeros((len(baseline_data), 3))
+    for i, threshold in enumerate(CONFIDENCE_THRESHOLDS):
+        min_values, max_values = get_bounds(baseline_data["location"], threshold, transform)
+        lower = norm.cdf(min_values, loc=baseline_data["location"], scale=baseline_data["scale"])
+        upper = norm.cdf(max_values, loc=baseline_data["location"], scale=baseline_data["scale"])
+        delta = upper - lower
+        confidence[:, i] = delta
+        baseline_data[f"p(within {threshold:g}x)"] = delta
+    baseline_data["confidence_level"] = [assign_confidence_level(row).name for row in confidence]
+    assign_calibration_levels(baseline_data, transform=Transform.LOG)
+    assert all(np.equal(baseline_data["confidence_level_best_case"], calibration_data["confidence_level_best_case"]))
+    return baseline_data
 
 
 def get_global_calibration_data(data: pd.DataFrame, delta: datetime.timedelta | None = None) -> pd.DataFrame:
